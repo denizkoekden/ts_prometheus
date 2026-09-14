@@ -20,6 +20,21 @@ class Sample {
   }
 }
 
+/**
+ * A summary tracks observations and exposes configurable quantiles over a
+ * sliding window, plus their sum and count.
+ *
+ * @example
+ * ```ts
+ * const summary = Summary.with({
+ *   name: "http_request_duration_seconds",
+ *   help: "Request duration in seconds.",
+ *   quantiles: [0.5, 0.9, 0.99],
+ *   maxAge: 60_000,
+ * });
+ * summary.observe(0.3);
+ * ```
+ */
 export class Summary extends Metric implements Observe {
   private collector: Collector;
   private quantiles: number[];
@@ -27,6 +42,18 @@ export class Summary extends Metric implements Observe {
   private maxAge?: number;
   private ageBuckets?: number;
 
+  /**
+   * Creates the metric and registers it with the given registries (the
+   * default registry when none is given).
+   *
+   * @param config.name Metric name, e.g. `http_requests_total`.
+   * @param config.help Help text shown in the `# HELP` line.
+   * @param config.labels Label names the metric can be partitioned by.
+   * @param config.registry Registries to register with, default `[Registry.default]`.
+   * @param config.quantiles Quantiles in `[0, 1]` to expose, default `[.01, .05, .5, .95, .99]`.
+   * @param config.maxAge Drop observations older than this many milliseconds.
+   * @param config.ageBuckets Keep at most this many of the newest observations.
+   */
   static with(
     config: {
       name: string;
@@ -79,12 +106,14 @@ export class Summary extends Metric implements Observe {
     });
   }
 
+  /** Metric name plus rendered labels. */
   get description(): string {
     const labels = this.getLabelsAsString();
     return `${this.collector.name}${labels}`;
   }
 
-  private clean() {
+  /** Drops observations outside the `maxAge` / `ageBuckets` window. */
+  private clean(): void {
     // Remove older than maxAge
     if (this.maxAge !== undefined) {
       const limit = new Date().getTime() - this.maxAge;
@@ -105,6 +134,7 @@ export class Summary extends Metric implements Observe {
     }
   }
 
+  /** Quantile, sum and count lines, or `undefined` while nothing was observed. */
   expose(): string | undefined {
     if (this.values.length === 0) {
       return undefined;
@@ -133,6 +163,11 @@ export class Summary extends Metric implements Observe {
     return text;
   }
 
+  /**
+   * Returns the child summary for the given label values.
+   *
+   * @throws if a label name was not declared in `Summary.with`.
+   */
   labels(labels: Labels): Observe {
     let child = new Summary(this.collector, this.labelNames, this.quantiles);
 
@@ -153,20 +188,24 @@ export class Summary extends Metric implements Observe {
     };
   }
 
-  observe(n: number) {
+  /** Records the observation `n`. */
+  observe(n: number): void {
     this.values.push(new Sample(n));
   }
 
+  /** Number of observations inside the window. */
   getCount(): number {
     this.clean();
     return this.values.length;
   }
 
+  /** Sum of the observations inside the window. */
   getSum(): number {
     this.clean();
     return this.values.reduce((sum, v) => sum + v.getValue(), 0);
   }
 
+  /** The observed values inside the window, in insertion order. */
   getValues(): number[] {
     this.clean();
     return this.values.map((s) => s.getValue());

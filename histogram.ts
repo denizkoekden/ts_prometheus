@@ -2,6 +2,20 @@ import { Collector } from "./collector.ts";
 import { type Labels, Metric, type Observe } from "./metric.ts";
 import type { Registry } from "./registry.ts";
 
+/**
+ * A histogram counts observations into configurable buckets and tracks their
+ * sum and count.
+ *
+ * @example
+ * ```ts
+ * const histogram = Histogram.with({
+ *   name: "http_request_duration_seconds",
+ *   help: "Request duration in seconds.",
+ *   buckets: [0.1, 0.5, 1, 5],
+ * });
+ * histogram.observe(0.3);
+ * ```
+ */
 export class Histogram extends Metric implements Observe {
   private collector: Collector;
   private buckets: number[];
@@ -9,6 +23,16 @@ export class Histogram extends Metric implements Observe {
   private sum: number;
   private values: number[];
 
+  /**
+   * Creates the metric and registers it with the given registries (the
+   * default registry when none is given).
+   *
+   * @param config.name Metric name, e.g. `http_requests_total`.
+   * @param config.help Help text shown in the `# HELP` line.
+   * @param config.labels Label names the metric can be partitioned by.
+   * @param config.registry Registries to register with, default `[Registry.default]`.
+   * @param config.buckets Upper bounds of the buckets; a `+Inf` bucket is added automatically.
+   */
   static with(
     config: {
       name: string;
@@ -46,11 +70,13 @@ export class Histogram extends Metric implements Observe {
     this.collector.getOrSetMetric(this);
   }
 
+  /** Metric name plus rendered labels. */
   get description(): string {
     const labels = this.getLabelsAsString();
     return `${this.collector.name}${labels}`;
   }
 
+  /** Bucket, sum and count lines, or `undefined` while nothing was observed. */
   expose(): string | undefined {
     if (this.count == 0) {
       return undefined;
@@ -70,6 +96,11 @@ export class Histogram extends Metric implements Observe {
     return text;
   }
 
+  /**
+   * Returns the child histogram for the given label values.
+   *
+   * @throws if a label name was not declared in `Histogram.with`.
+   */
   labels(labels: Labels): Observe {
     let child = new Histogram(this.collector, this.labelNames, this.buckets);
 
@@ -90,7 +121,8 @@ export class Histogram extends Metric implements Observe {
     };
   }
 
-  observe(n: number) {
+  /** Records the observation `n`. */
+  observe(n: number): void {
     const index = this.buckets.findIndex((v) => v >= n);
 
     for (let i = index; i < this.values.length; i++) {

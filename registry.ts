@@ -1,8 +1,27 @@
 import type { Collector } from "./collector.ts";
 
+/**
+ * Holds a set of collectors and renders their metrics in the Prometheus text
+ * exposition format.
+ *
+ * Metrics register with {@linkcode Registry.default} unless a `registry`
+ * option is given when creating them.
+ *
+ * @example
+ * ```ts
+ * const registry = new Registry();
+ * const counter = Counter.with({
+ *   name: "my_counter",
+ *   help: "a counter with a custom registry",
+ *   registry: [registry],
+ * });
+ * counter.inc();
+ * console.log(registry.metrics());
+ * ```
+ */
 export class Registry {
-  // The default CollectorRegistry
-  static default = new Registry();
+  /** The default registry every metric registers with unless told otherwise. */
+  static default: Registry = new Registry();
 
   private collectors: Map<string, Collector>;
 
@@ -10,7 +29,12 @@ export class Registry {
     this.collectors = new Map();
   }
 
-  register(collector: Collector) {
+  /**
+   * Registers a collector.
+   *
+   * @throws if a collector with the same name is already registered.
+   */
+  register(collector: Collector): void {
     const found = this.collectors.has(collector.name);
     if (found) {
       throw new Error(
@@ -20,14 +44,20 @@ export class Registry {
     this.collectors.set(collector.name, collector);
   }
 
-  unregister(collector: Collector) {
+  /** Removes a collector. Unknown collectors are ignored. */
+  unregister(collector: Collector): void {
     this.collectors.delete(collector.name);
   }
 
-  clear() {
+  /** Removes every collector. */
+  clear(): void {
     this.collectors = new Map();
   }
 
+  /**
+   * Renders all registered metrics in the Prometheus text exposition format.
+   * Metrics without any recorded value are omitted.
+   */
   metrics(): string {
     let text = "";
     for (const [_, collector] of this.collectors) {
