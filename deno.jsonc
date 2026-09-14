@@ -1,4 +1,17 @@
 {
+  "name": "@denizkoekden/ts-prometheus",
+  "version": "0.4.0",
+  "license": "MIT",
+  "exports": "./mod.ts",
+  "publish": {
+    "exclude": [
+      "example/",
+      "**/*_test.ts",
+      "test_deps.ts",
+      ".github/",
+      "deno.lock"
+    ]
+  },
   "fmt": {
     "options": {
       "useTabs": false,

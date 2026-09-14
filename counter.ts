@@ -1,6 +1,6 @@
 import { Collector } from "./collector.ts";
-import { Inc, Labels, Metric, Value } from "./metric.ts";
-import { Registry } from "./registry.ts";
+import { type Inc, type Labels, Metric, type Value } from "./metric.ts";
+import type { Registry } from "./registry.ts";
 export class Counter extends Metric implements Inc, Value {
   private collector: Collector;
   private _value?: number;

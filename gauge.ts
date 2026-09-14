@@ -1,6 +1,13 @@
 import { Collector } from "./collector.ts";
-import { Dec, Inc, Labels, Metric, Set, Value } from "./metric.ts";
-import { Registry } from "./registry.ts";
+import {
+  type Dec,
+  type Inc,
+  type Labels,
+  Metric,
+  type Set,
+  type Value,
+} from "./metric.ts";
+import type { Registry } from "./registry.ts";
 
 export class Gauge extends Metric implements Inc, Dec, Value {
   private collector: Collector;

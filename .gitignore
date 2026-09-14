@@ -1,2 +1,3 @@
 dist
 .vscode
+deno.lock

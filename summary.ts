@@ -1,6 +1,6 @@
 import { Collector } from "./collector.ts";
-import { Labels, Metric, Observe } from "./metric.ts";
-import { Registry } from "./registry.ts";
+import { type Labels, Metric, type Observe } from "./metric.ts";
+import type { Registry } from "./registry.ts";
 
 class Sample {
   private timestamp: number;

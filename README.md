@@ -1,7 +1,16 @@
 # ts_prometheus
 
-A prometheus client for Deno that supports counter, gauge, histrogram and
+A prometheus client for Deno that supports counter, gauge, histogram and
 summary metric types.
+
+Published on JSR as [`@denizkoekden/ts-prometheus`](https://jsr.io/@denizkoekden/ts-prometheus),
+a fork of [marcopacini/ts_prometheus](https://github.com/marcopacini/ts_prometheus).
+
+## Installation
+
+```ts
+import { Counter, Registry } from "jsr:@denizkoekden/ts-prometheus";
+```
 
 ## Usage
 
@@ -21,9 +30,9 @@ const myCounter = Counter.with({
 
 ## Examples
 
-- [ts-prometheus](https://github.com/marcopacini/ts-prometheus/blob/master/example/example.ts)
-- [oak](https://github.com/marcopacini/ts-prometheus/blob/master/example/oak/example.ts)
-- [Hono](https://github.com/marcopacini/ts-prometheus/blob/master/example/hono/example.ts)
+- [ts-prometheus](https://github.com/denizkoekden/ts_prometheus/blob/master/example/example.ts)
+- [oak](https://github.com/denizkoekden/ts_prometheus/blob/master/example/oak/example.ts)
+- [Hono](https://github.com/denizkoekden/ts_prometheus/blob/master/example/hono/example.ts)
 
 ## Metric Types
 

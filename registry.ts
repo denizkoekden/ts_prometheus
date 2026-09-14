@@ -1,4 +1,4 @@
-import { Collector } from "./collector.ts";
+import type { Collector } from "./collector.ts";
 
 export class Registry {
   // The default CollectorRegistry

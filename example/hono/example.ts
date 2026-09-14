@@ -1,6 +1,5 @@
-import { serve } from "https://deno.land/std@0.175.0/http/server.ts";
-import { Context, Hono } from "https://deno.land/x/hono/mod.ts";
-import { Counter, Registry } from "https://deno.land/x/ts_prometheus/mod.ts";
+import { type Context, Hono } from "jsr:@hono/hono@^4";
+import { Counter, Registry } from "jsr:@denizkoekden/ts-prometheus";
 
 const app = new Hono();
 
@@ -31,4 +30,4 @@ app.get("/", (c): Response => {
   return c.text("Hello World", 200);
 });
 
-serve(app.fetch);
+Deno.serve(app.fetch);

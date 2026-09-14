@@ -1,5 +1,5 @@
-import { Application, Router } from "https://deno.land/x/oak/mod.ts";
-import { Counter, Registry } from "https://deno.land/x/ts_prometheus/mod.ts";
+import { Application, Router } from "jsr:@oak/oak@^17";
+import { Counter, Registry } from "jsr:@denizkoekden/ts-prometheus";
 
 const counter = Counter.with({
   name: "http_requests_total",

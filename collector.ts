@@ -1,4 +1,4 @@
-import { Metric } from "./metric.ts";
+import type { Metric } from "./metric.ts";
 import { Registry } from "./registry.ts";
 
 export class Collector {
