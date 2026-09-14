@@ -12,6 +12,9 @@
       "deno.lock"
     ]
   },
+  "lint": {
+    "exclude": ["example/"]
+  },
   "fmt": {
     "options": {
       "useTabs": false,
